@@ -14,3 +14,17 @@ $ pig -x local -f pregunta.pig
 
         >>> Escriba su respuesta a partir de este punto <<<
 */
+data = LOAD 'data.tsv' USING PigStorage('\t')
+    AS (
+            mayuscula:chararray,
+            minuscula:chararray,
+            claves:chararray          
+        ); 
+
+filtro1 = FOREACH data GENERATE mayuscula, TOKENIZE(minuscula,',') as minus, TOKENIZE(claves,',') as clave; 
+
+filtro2 = FOREACH filtro1 GENERATE mayuscula, COUNT(minus) as minus, COUNT(clave) as clave; 
+
+filtro3= ORDER filtro2 BY mayuscula asc, minus asc, clave asc; 
+
+STORE filtro3 INTO 'output/' USING PigStorage(',');
