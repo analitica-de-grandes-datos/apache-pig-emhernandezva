@@ -17,3 +17,21 @@ $ pig -x local -f pregunta.pig
         >>> Escriba su respuesta a partir de este punto <<<
 */
 
+data = LOAD 'data.tsv' USING PigStorage('\t')
+    AS (
+            mayuscula:chararray,
+            minuscula:chararray,
+            claves:chararray          
+        ); 
+
+filtro1 = FOREACH data GENERATE mayuscula, FLATTEN(TOKENIZE(minuscula,',')) as minus, FLATTEN(TOKENIZE(claves,',')) as clave; 
+
+filtro2 = FOREACH filtro1 GENERATE REPLACE (minus,'([^a-zA-Z\\s]+)','') as minus, REPLACE (clave,'([^a-zA-Z\\s]+)','') as clave;
+
+filtro3 = FOREACH filtro2 GENERATE TOTUPLE(minus,clave) as tupla; 
+
+filtro4 = GROUP filtro3 BY tupla; 
+
+filtro5 = FOREACH filtro4 GENERATE group, COUNT(filtro3); 
+
+STORE filtro5 INTO 'output/' USING PigStorage(',');
