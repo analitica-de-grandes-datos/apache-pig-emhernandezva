@@ -14,3 +14,20 @@ $ pig -x local -f pregunta.pig
         >>> Escriba su respuesta a partir de este punto <<<
 */
 
+datos = LOAD 'data.csv' USING PigStorage(',')
+    AS (
+            id:int,
+            nombre:chararray,
+            apellido:chararray,
+            f_nac:chararray,
+            color:chararray,
+            id2:int          
+        ); 
+
+ano = FOREACH datos GENERATE SUBSTRING(f_nac,0,4) as anio;
+
+filtro1= GROUP ano by anio; 
+
+cuenta = FOREACH filtro1 GENERATE group, COUNT(ano);
+
+STORE cuenta INTO 'output/' USING PigStorage(',');
