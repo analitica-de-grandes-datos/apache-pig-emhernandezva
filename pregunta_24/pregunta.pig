@@ -20,3 +20,17 @@ $ pig -x local -f pregunta.pig
 */
 
 
+datos = LOAD 'data.csv' USING PigStorage(',')
+    AS (
+            id:int,
+            nombre:chararray,
+            apellido:chararray,
+            f_nac:chararray,
+            color:chararray,
+            id2:int           
+        ); 
+
+
+filtro2 = FOREACH datos GENERATE REGEX_EXTRACT(f_nac,'(.*)-(.*)-(.*)',2) as mes; 
+
+STORE filtro2 INTO 'output/' USING PigStorage(',');
