@@ -34,3 +34,24 @@ $ pig -x local -f pregunta.pig
         >>> Escriba su respuesta a partir de este punto <<<
 */
 
+datos = LOAD 'data.csv' USING PigStorage(',')
+    AS (
+            id:int,
+            nombre:chararray,
+            apellido:chararray,
+            f_nac:chararray,
+            color:chararray,
+            id2:int          
+        ); 
+filtro1 = FOREACH datos GENERATE f_nac, ToDate(f_nac,'yyyy-MM-dd') as fecha;
+filtro2 = FOREACH filtro1 GENERATE f_nac, SUBSTRING(f_nac,8,10) as dia, GetDay(fecha) as dia2, LOWER(ToString(fecha,'EEEEE')) as dia3; 
+filtro3 = FOREACH filtro2 GENERATE f_nac, dia, dia2, REPLACE(dia3,'monday','lunes') as dia3;  
+filtro4 = FOREACH filtro3 GENERATE f_nac, dia, dia2, REPLACE(dia3,'tuesday','martes') as dia3;  
+filtro5 = FOREACH filtro4 GENERATE f_nac, dia, dia2, REPLACE(dia3,'wednesday','miercoles') as dia3;  
+filtro6 = FOREACH filtro5 GENERATE f_nac, dia, dia2, REPLACE(dia3,'thursday','jueves') as dia3;  
+filtro7 = FOREACH filtro6 GENERATE f_nac, dia, dia2, REPLACE(dia3,'friday','viernes') as dia3;  
+filtro8 = FOREACH filtro7 GENERATE f_nac, dia, dia2, REPLACE(dia3,'saturday','sabado') as dia3;  
+filtro9 = FOREACH filtro8 GENERATE f_nac, dia, dia2, REPLACE(dia3,'sunday','domingo') as dia3;
+filtro10 = FOREACH filtro9 GENERATE f_nac, dia, dia2, SUBSTRING(dia3,0,3), dia3;  
+
+STORE filtro10 INTO 'output/' USING PigStorage(',');
